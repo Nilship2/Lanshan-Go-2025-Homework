@@ -14,6 +14,6 @@ func trans(a []int) map[int]int {
 }
 func main() {
 
-	fmt.Print(trans([]int{1, 2, 3, 4, 4, 5, 5, 5, 5, 5, 5}))
+	//fmt.Print(trans([]int{1, 2, 3, 4, 4, 5, 5, 5, 5, 5, 5}))
 
 }
