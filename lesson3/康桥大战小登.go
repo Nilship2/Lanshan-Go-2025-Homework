@@ -61,12 +61,12 @@ func main() {
 	p2.init()
 	p1.name = "康桥"
 	p2.name = "小登"
-	fmt.Printf("%s hp:%d mp:%d\n", p1.name, p1.hp, p1.mp)
-	fmt.Printf("%s hp:%d mp:%d\n", p2.name, p2.hp, p2.mp)
+	fmt.Printf("%s hp:%d mp:%d 剩余道具数量：%d\n", p1.name, p1.hp, p1.mp, p1.itemnum)
+	fmt.Printf("%s hp:%d mp:%d 剩余道具数量：%d\n", p2.name, p2.hp, p2.mp, p2.itemnum)
 	round := 1
 	for p1.hp > 0 && p2.hp > 0 {
 		var act Use
-		i := rand.Intn(3)
+		i := rand.Intn(114514) % 3
 		num := 0
 		act = &p1
 		if i == 0 && p1.mp > 0 {
@@ -94,8 +94,8 @@ func main() {
 		}
 		fmt.Printf("Round %d:\n", round)
 
-		fmt.Printf("name:%s hp:%d mp:%d\n", p1.name, p1.hp, p1.mp)
-		fmt.Printf("name:%s hp:%d mp:%d\n", p2.name, p2.hp, p2.mp)
+		fmt.Printf("%s hp:%d mp:%d 剩余道具数量：%d\n", p1.name, p1.hp, p1.mp, p1.itemnum)
+		fmt.Printf("%s hp:%d mp:%d 剩余道具数量：%d\n", p2.name, p2.hp, p2.mp, p2.itemnum)
 		round++
 		if num >= 2 {
 			fmt.Println("双方筋疲力尽瘫坐在地上！")
