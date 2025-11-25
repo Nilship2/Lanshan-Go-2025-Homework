@@ -17,7 +17,7 @@ func main() {
 		fmt.Fprintf(file, "%s %s\n", time.Now().String(), b)
 
 		//fmt.Println("%s %s", time.Now().String(), string(b))
-		//不知道为什么爆黄，懒得修直接注释
+		//不是我修得来的爆黄，直接注释
 		//更暴力的同步输出（）
 
 	}
