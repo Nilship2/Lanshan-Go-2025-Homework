@@ -20,7 +20,6 @@ func DoTask(fileCh <-chan string, resultCh chan<- string, keyword string) {
 			}
 		}()
 	}
-	//封装！！！
 	wg.Wait()
 }
 
