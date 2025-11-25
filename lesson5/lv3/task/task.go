@@ -15,7 +15,7 @@ func DoTask(fileCh <-chan string, resultCh chan<- string, keyword string) {
 		go func() {
 			defer wg.Done()
 			for filePath := range fileCh {
-				fmt.Printf("正在搜索文件: %s\n", filePath)
+				//fmt.Printf("正在搜索文件: %s\n", filePath)
 				searchInFile(filePath, keyword, resultCh)
 			}
 		}()

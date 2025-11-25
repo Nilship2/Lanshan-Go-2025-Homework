@@ -9,7 +9,16 @@ import (
 )
 
 func main() {
-	aimPath := "./source"
+
+	if len(os.Args) != 3 {
+		fmt.Printf("用法: ./catch [目录] [关键词]\n")
+		os.Exit(1)
+	}
+
+	dir := os.Args[1]
+	keyword := os.Args[2]
+
+	aimPath := dir
 	fileCh := make(chan string, 100)
 	resultCh := make(chan string, 100)
 
@@ -41,8 +50,8 @@ func main() {
 		}
 	}()
 	fmt.Println("要查找什么关键词呢：")
-	var keyword string
-	fmt.Scanf("%s", &keyword)
+	//var keyword string
+	//fmt.Scanf("%s", &keyword)
 	task.DoTask(fileCh, resultCh, keyword)
 	close(resultCh)
 	resultWg.Wait()
