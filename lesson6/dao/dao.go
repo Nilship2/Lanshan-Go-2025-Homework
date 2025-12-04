@@ -32,7 +32,7 @@ func Fileread() {
 
 func Fileadd(key string, value string) {
 	logfile, _ := os.OpenFile("userdata.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	fmt.Println("嗨嗨嗨")
+	//fmt.Println("嗨嗨嗨")
 	fmt.Fprintf(logfile, "%s,%s\n", key, value)
 	defer logfile.Close()
 
@@ -65,15 +65,20 @@ func Fileope(key string, value string) {
 }
 func AddUser(username string, password string) {
 
-	if database[username] != "" {
-		fmt.Println("嗨嗨嗨！！！")
+	if UserExists(username) {
+		//fmt.Println("嗨嗨嗨！！！")
 		Fileope(username, password)
 		database[username] = password
 		return
 	}
 	database[username] = password
-	fmt.Println("嚯嚯嚯！！！")
+	//fmt.Println("嚯嚯嚯！！！")
 	Fileadd(username, password)
+}
+
+func UserExists(username string) bool {
+	_, ok := database[username]
+	return ok
 }
 
 func FindUser(username string, password string) bool {

@@ -77,12 +77,29 @@ func Changepwd(c *gin.Context) {
 		})
 		return
 	}
-	/*if !dao.FindUser(req.Username, req.Password) {
+	//c.Next()
+	// 从中间件注入的 username（token 里的用户名）
+	//fmt.Println(">>>", c.GetString("username"))
+	tokenUser := c.GetString("username")
+	if tokenUser == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		return
+	}
+
+	// 如果前端传了 username，确保与 token 中一致；否则使用 token 的用户名
+	if req.Username != "" && req.Username != tokenUser {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "username mismatch"})
+		return
+	}
+	req.Username = tokenUser
+
+	if !dao.UserExists(req.Username) {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "user not found",
+			"message": "有这个用户吗你就瞎几把改改改",
 		})
 		return
-	}*/
+	}
+
 	dao.AddUser(req.Username, req.Password)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "password changed successfully",
@@ -97,6 +114,6 @@ func InitRouter_gin() {
 
 	r.POST("register", Register)
 	r.POST("login", Login)
-	r.POST("changepwd", Changepwd)
+	r.POST("changepwd", middleware.Auth(), Changepwd)
 	r.Run(":8080")
 }
