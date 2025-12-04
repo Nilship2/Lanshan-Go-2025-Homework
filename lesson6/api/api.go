@@ -91,6 +91,8 @@ func Changepwd(c *gin.Context) {
 
 func InitRouter_gin() {
 	r := gin.Default()
+	dao.Fileread()
+	// 中间件使用示例
 	r.GET("/ping", middleware.Example1(), middleware.Example2(), Ping1)
 
 	r.POST("register", Register)
