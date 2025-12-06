@@ -36,30 +36,57 @@ func Register(c *gin.Context) {
 func Login(c *gin.Context) {
 	var req model.User
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "bad request",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		return
 	}
-	// 检查用户是否存在且密码是否正确
 	if !dao.FindUser(req.Username, req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "user not found",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "user not found"})
 		return
 	}
-	// 生成jwt token
+
 	token, err := utils.MakeToken(req.Username, time.Now().Add(10*time.Minute))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "internal server error",
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
 		return
 	}
-	// 返回token
+
+	refreshToken := utils.MakeRefreshToken()
+	dao.SaveRefreshToken(req.Username, refreshToken)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "login",
-		"token":   token,
+		"message":       "login",
+		"token":         token,
+		"refresh_token": refreshToken,
+	})
+}
+
+func Refresh(c *gin.Context) {
+	var body struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.RefreshToken == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		return
+	}
+	username := dao.GetUsernameByRefreshToken(body.RefreshToken)
+	if username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "invalid refresh token"})
+		return
+	}
+
+	// 签发新的 access token
+	newToken, err := utils.MakeToken(username, time.Now().Add(10*time.Minute))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
+		return
+	}
+	// 可选：轮换 refresh token（推荐）
+	newRefresh := utils.MakeRefreshToken()
+	dao.SaveRefreshToken(username, newRefresh)
+
+	c.JSON(http.StatusOK, gin.H{
+		"token":         newToken,
+		"refresh_token": newRefresh,
 	})
 }
 
@@ -78,7 +105,6 @@ func Changepwd(c *gin.Context) {
 		return
 	}
 	//c.Next()
-	// 从中间件注入的 username（token 里的用户名）
 	//fmt.Println(">>>", c.GetString("username"))
 	tokenUser := c.GetString("username")
 	if tokenUser == "" {
@@ -114,6 +140,7 @@ func InitRouter_gin() {
 
 	r.POST("register", Register)
 	r.POST("login", Login)
+	r.POST("refresh", Refresh) // 新增刷新接口
 	r.POST("changepwd", middleware.Auth(), Changepwd)
 	r.Run(":8080")
 }

@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"time"
 )
@@ -8,6 +10,12 @@ import (
 func MakeToken(username string, expireTime time.Time) (string, error) {
 	token := username + "|" + expireTime.Format(time.RFC3339)
 	return token, nil
+}
+
+func MakeRefreshToken() string {
+	b := make([]byte, 32)
+	_, _ = rand.Read(b)
+	return hex.EncodeToString(b)
 }
 
 func ParseToken(token string) (string, error) {

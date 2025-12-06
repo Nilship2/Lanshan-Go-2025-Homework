@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sync"
 )
 
-// 模拟数据库
 var database = map[string]string{}
 
 func Fileread() {
@@ -91,4 +91,21 @@ func FindUser(username string, password string) bool {
 }
 func SelectPasswordFromUsername(username string) string {
 	return database[username]
+}
+
+var (
+	refreshMu     sync.RWMutex
+	refreshToUser = map[string]string{}
+)
+
+func SaveRefreshToken(username, token string) {
+	refreshMu.Lock()
+	refreshToUser[token] = username
+	refreshMu.Unlock()
+}
+
+func GetUsernameByRefreshToken(token string) string {
+	refreshMu.RLock()
+	defer refreshMu.RUnlock()
+	return refreshToUser[token]
 }
